@@ -14,7 +14,7 @@ int main(int argc, char** argv, char** env) {
     Verilated::traceEverOn(true);
     VerilatedVcdC *m_trace = new VerilatedVcdC;
     dut->trace(m_trace, 5);
-    m_trace->open("waveforms/waveform.vcd");
+    m_trace->open("waveforms/tb_sp_ram.vcd");
 
     dut->address = 0x00000000;
     dut->data_le = 1;
