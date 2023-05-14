@@ -16,7 +16,7 @@ module instr_decoder
             // synthesis translate_off
             $display("\t [DECODE]");
             $display("Decoding instruction: \t0x%8h", instr.word);
-            $display("Opcode: \t\t0b%7b", instr.any.opcode);
+            $display("Opcode: \t\t0b%7b [%s]", instr.any.opcode, instr.any.opcode.name());
 
             if (instr.any.opcode != LUI)
             begin

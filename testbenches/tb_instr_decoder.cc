@@ -37,7 +37,7 @@ int main(int argc, char** argv, char** env) {
   
     m_trace->dump(sim_time);
 
-    assert(dut->ctl_signals.regfile_we == 1);
+    assert(dut->ctl_signals == 1);
 
     m_trace->close();
     delete dut;
