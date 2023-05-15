@@ -7,7 +7,7 @@ VERILATOR_FLAGS=--trace -cc
 WAVEFORM_PATH=waveforms
 
 
-all: sp_ram register_file instr_decoder
+all: sp_ram register_file instr_decoder main_ctl core
 
 
 sp_ram:
@@ -24,6 +24,20 @@ instr_decoder:
 	${VERILATOR} ${VERILATOR_FLAGS} ${RTL_PATH}/instr_decoder.sv --exe ${TBS_PATH}/tb_instr_decoder.cc
 	make -C obj_dir -f Vinstr_decoder.mk Vinstr_decoder
 	./obj_dir/Vinstr_decoder
+
+main_ctl:
+	${VERILATOR} ${VERILATOR_FLAGS} ${RTL_PATH}/main_ctl.sv --exe ${TBS_PATH}/tb_main_ctl.cc
+	make -C obj_dir -f Vmain_ctl.mk Vmain_ctl
+	./obj_dir/Vmain_ctl
+
+core:
+	${VERILATOR} ${VERILATOR_FLAGS} ${RTL_PATH}/core.sv \
+		${RTL_PATH}/instr_decoder.sv \
+		${RTL_PATH}/register_file.v \
+		--exe ${TBS_PATH}/tb_core.cc
+	make -C obj_dir -f Vcore.mk Vcore
+	./obj_dir/Vcore
+
 
 
 clean:
