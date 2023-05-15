@@ -1,7 +1,7 @@
 typedef enum logic[6:0]
 {
     LUI = 7'b0110111
-} opcode_t;
+} opcode_t /*verilator public*/;
 
 typedef struct packed 
 {

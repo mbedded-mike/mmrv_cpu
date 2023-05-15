@@ -2,9 +2,11 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 #include "Vinstr_decoder.h"
-#include "Vinstr_decoder___024root.h"
+#include "Vinstr_decoder___024unit.h"
 
 vluint64_t sim_time = 0;
+
+typedef Vinstr_decoder___024unit::opcode_t opcode_t;
 
 int main(int argc, char** argv, char** env) {
     Vinstr_decoder *dut = new Vinstr_decoder;
@@ -16,8 +18,8 @@ int main(int argc, char** argv, char** env) {
 
     dut->clk = 1;
     dut->ce = 1;
-    /* LUI instruction */
-    dut->instr = 0b0110111;
+    /* lui 0, r0 instruction */
+    dut->instr = opcode_t::LUI;
 
     dut->clk ^= 1;
     dut->eval();
