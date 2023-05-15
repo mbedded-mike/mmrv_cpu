@@ -1,3 +1,6 @@
+`ifndef INSTR_SV
+`define INSTR_SV
+
 typedef enum logic[6:0]
 {
     LUI = 7'b0110111
@@ -28,3 +31,4 @@ typedef struct packed
     logic regfile_we;
 } decoder_ctl_signals_t;
 
+`endif
