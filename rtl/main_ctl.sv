@@ -3,6 +3,8 @@
 /* main controller for the multicycle cpu */
 typedef struct packed
 {
+    logic alu_ce;
+    logic gp_regfile_we;
     logic fetch_en;
     logic memory_ce;
     logic gp_regfile_ce;
@@ -63,7 +65,9 @@ module main_ctl
     assign ctl_signals.memory_ce     = (state == WRITEBACK || state == FETCH) ? 1 : 0;
     assign ctl_signals.gp_regfile_ce = (state == EXECUTE   || state == WRITEBACK) ? 1 : 0;
     assign ctl_signals.instrdec_ce   = (state == DECODE) ? 1 : 0;
-    assign ctl_signals.pc_inc        = (state == DECODE) ? 1 : 0;
+    assign ctl_signals.pc_inc        = (state == EXECUTE) ? 1 : 0;
     assign ctl_signals.fetch_en      = (state == FETCH) ? 1 : 0;
+    assign ctl_signals.gp_regfile_we = (state == WRITEBACK && instr.any.opcode == AUIPC) ? 1 : 0;
+    assign ctl_signals.alu_ce        = (state == EXECUTE && instr.any.opcode != LUI) ? 1 : 0;
 
 endmodule

@@ -19,9 +19,9 @@ module instr_decoder
             $display("\tDecoding instruction: \t0x%8h", instr.word);
             $display("\tOpcode: \t\t0b%7b [%s]", instr.any.opcode, instr.any.opcode.name());
 
-            if (instr.any.opcode != LUI)
+            if (instr.any.opcode.name == "")
             begin
-                $display("instruction not supported!");
+                $display("\tWARNING: Instruction not supported!");
             end 
         end 
     end
@@ -32,7 +32,17 @@ module instr_decoder
     assign rs1_idx = 5'b0;
     assign rs2_idx = 5'b0;
 
-    assign rd_idx = (instr.any.opcode == LUI) ? instr.utype.rd : 5'b0; 
-    assign rd_in = (instr.any.opcode == LUI) ? { instr.utype.imm, 12'b0 } : 32'b0;
+    assign rd_idx = (
+            instr.any.opcode == LUI
+        ||  instr.any.opcode == AUIPC
+    ) ? instr.utype.rd : 5'b0; 
+
+    assign rd_in = (instr.any.opcode == LUI || instr.any.opcode == AUIPC) 
+                    ? { instr.utype.imm, 12'b0 } : 32'b0;    
+    
+    assign ctl_signals.rs1_sel = (instr.any.opcode == AUIPC) ? 0 : 1;
+    assign ctl_signals.rs2_sel = (instr.any.opcode == AUIPC) ? 0 : 1;
+    assign ctl_signals.rd_in_sel  = (instr.any.opcode == AUIPC) ? 0 : 1;
+    assign ctl_signals.alu_sel = (instr.any.opcode == AUIPC) ? ADD : 0;
 
 endmodule

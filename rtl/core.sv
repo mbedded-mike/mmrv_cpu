@@ -63,6 +63,8 @@ module core
     wire [31:0] rs1;
     wire [31:0] rs2;
     wire [31:0] rd_in;
+    /* immediate value, literally extracted from an instruction */
+    wire [31:0] imm;
 
     /* main instruction decoder */
     instr_decoder id(
@@ -73,7 +75,7 @@ module core
         .rd_idx(rd_idx),
         .rs1_idx(rs1_idx),
         .rs2_idx(rs2_idx),
-        .rd_in(rd_in)
+        .rd_in(imm)
     ); 
     
     /* general purpose register file */
@@ -82,12 +84,29 @@ module core
         .ce(mctl_signals.gp_regfile_ce),
         .rd_idx(rd_idx),
         .data_in(rd_in),
-        .write_en(dctl_signals.regfile_we),
+        .write_en(dctl_signals.regfile_we | mctl_signals.gp_regfile_we),
         .rs1_idx(rs1_idx),
         .rs2_idx(rs2_idx),
         .rs1(rs1),
         .rs2(rs2)
     );
 
+    wire [31:0] alu_lhs;
+    wire [31:0] alu_rhs;
+    wire [31:0] alu_result;
+
+    alu main_alu(
+        .clk(clk),
+        .ce(mctl_signals.alu_ce),
+        .op_sel(dctl_signals.alu_sel),
+        .operand1(alu_lhs),
+        .operand2(alu_rhs),
+        .result(alu_result)
+    );
+
+    assign alu_lhs = dctl_signals.rs1_sel ? rs1 : pc;
+    assign alu_rhs = dctl_signals.rs2_sel ? rs2 : imm;
+    
+    assign rd_in = dctl_signals.rd_in_sel ? imm : alu_result;  
 
 endmodule;
