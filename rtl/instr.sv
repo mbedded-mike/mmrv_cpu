@@ -4,7 +4,8 @@
 typedef enum logic[6:0]
 {
     LUI = 7'b0110111,
-    AUIPC = 7'b0010111
+    AUIPC = 7'b0010111,
+    JAL = 7'b1101111
 } opcode_t /*verilator public*/;
 
 typedef struct packed 
@@ -29,7 +30,8 @@ typedef union packed
 
 typedef struct packed
 {
-    logic       rd_in_sel;
+    logic       pc_in_sel;
+    logic [1:0] rd_in_sel;
     logic [2:0] alu_sel;
     logic       rs1_sel;
     logic       rs2_sel;

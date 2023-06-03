@@ -28,7 +28,7 @@ module main_ctl
     typedef enum reg[2:0] {RESET, FETCH, DECODE, EXECUTE, WRITEBACK} state_t;
     state_t state, next_state;
 
-    always @ (posedge clk)
+    always @ (negedge clk)
     begin
         if (reset)
         begin
@@ -65,9 +65,11 @@ module main_ctl
     assign ctl_signals.memory_ce     = (state == WRITEBACK || state == FETCH) ? 1 : 0;
     assign ctl_signals.gp_regfile_ce = (state == EXECUTE   || state == WRITEBACK) ? 1 : 0;
     assign ctl_signals.instrdec_ce   = (state == DECODE) ? 1 : 0;
-    assign ctl_signals.pc_inc        = (state == EXECUTE) ? 1 : 0;
+    assign ctl_signals.pc_inc        = (state == EXECUTE && instr.any.opcode != JAL) ||
+                                        (state == WRITEBACK && instr.any.opcode == JAL) ? 1 : 0;
     assign ctl_signals.fetch_en      = (state == FETCH) ? 1 : 0;
-    assign ctl_signals.gp_regfile_we = (state == WRITEBACK && instr.any.opcode == AUIPC) ? 1 : 0;
+    assign ctl_signals.gp_regfile_we = (state == WRITEBACK && instr.any.opcode == AUIPC) ||
+                                       (state == EXECUTE && instr.any.opcode == JAL) ? 1 : 0;
     assign ctl_signals.alu_ce        = (state == EXECUTE && instr.any.opcode != LUI) ? 1 : 0;
 
 endmodule

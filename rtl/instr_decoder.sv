@@ -22,7 +22,12 @@ module instr_decoder
             if (instr.any.opcode.name == "")
             begin
                 $display("\tWARNING: Instruction not supported!");
-            end 
+            end
+            
+            if (instr.any.opcode == JAL)
+            begin
+                $display("JTYPE IMM, decoded: \t%d (0x%8h)", jimm, jimm);
+            end
         end 
     end
     // synthesis translate_on 
@@ -35,14 +40,30 @@ module instr_decoder
     assign rd_idx = (
             instr.any.opcode == LUI
         ||  instr.any.opcode == AUIPC
+        ||  instr.any.opcode == JAL
     ) ? instr.utype.rd : 5'b0; 
 
-    assign rd_in = (instr.any.opcode == LUI || instr.any.opcode == AUIPC) 
-                    ? { instr.utype.imm, 12'b0 } : 32'b0;    
+    wire signed [31:0] jimm;
+
+    assign jimm[20] = instr.utype.imm[19];
+    assign jimm[10:1] = instr.utype.imm[18:9];
+    assign jimm[0] = 0;
+    assign jimm[11] = instr.utype.imm[8];
+    assign jimm[19:12] = instr.utype.imm[7:0];
+    /* sign extend the immediate value */
+    assign jimm[31:21] = (instr.utype.imm[19]) ? 11'h7FF : 11'b0;
+
+    assign rd_in = 
+        (instr.any.opcode == LUI || instr.any.opcode == AUIPC) ? { instr.utype.imm, 12'b0 } :
+        (instr.any.opcode == JAL) ? jimm
+        : 32'b0;    
     
-    assign ctl_signals.rs1_sel = (instr.any.opcode == AUIPC) ? 0 : 1;
-    assign ctl_signals.rs2_sel = (instr.any.opcode == AUIPC) ? 0 : 1;
-    assign ctl_signals.rd_in_sel  = (instr.any.opcode == AUIPC) ? 0 : 1;
+    assign ctl_signals.rs1_sel = (instr.any.opcode == AUIPC || instr.any.opcode == JAL) ? 0 : 1;
+    assign ctl_signals.rs2_sel = (instr.any.opcode == AUIPC || instr.any.opcode == JAL) ? 0 : 1;
+    assign ctl_signals.rd_in_sel  = (instr.any.opcode == AUIPC) ? 2'b10 : 
+                                    (instr.any.opcode == JAL) ? 2'b00 : 2'b01;
+
     assign ctl_signals.alu_sel = (instr.any.opcode == AUIPC) ? ADD : 0;
+    assign ctl_signals.pc_in_sel = (instr.any.opcode == JAL) ? 0 : 1;
 
 endmodule

@@ -18,9 +18,9 @@ vluint32_t phy_mem[] = {
     (1 << 12) | opcode_t::LUI,  
     /* auipc 4096, r1 */
     (1 << 12) | (1 << 7) | opcode_t::AUIPC,
-    /* lui c00h, r2 */
-    (12 << 12) | (1 << 8) | opcode_t::LUI,
-    /* auipc c00h, r3 */
+    /* jal 8, r2*/
+    (0b100000000000 << 12) | (1 << 8) | opcode_t::JAL,
+    /* auipc c00h, r4 <-- this instruction should never execute because of the previous jump */
     (12 << 12) | (1 << 9) | opcode_t::AUIPC,
 };
 

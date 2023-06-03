@@ -26,7 +26,12 @@ module core
         if (ce)
         begin
             if (mctl_signals.pc_inc)
-                pc <= pc + 4;
+            begin
+                if (dctl_signals.pc_in_sel)
+                    pc <= pc + 4;
+                else
+                    pc <= alu_result;
+            end
 
             if (mctl_signals.fetch_en)
             begin
@@ -107,6 +112,8 @@ module core
     assign alu_lhs = dctl_signals.rs1_sel ? rs1 : pc;
     assign alu_rhs = dctl_signals.rs2_sel ? rs2 : imm;
     
-    assign rd_in = dctl_signals.rd_in_sel ? imm : alu_result;  
+    assign rd_in =  dctl_signals.rd_in_sel == 2'b01  ? imm : 
+                    dctl_signals.rd_in_sel == 2'b10  ? alu_result :
+                                                       pc; 
 
 endmodule;
