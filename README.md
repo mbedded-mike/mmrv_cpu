@@ -14,6 +14,7 @@ Requirements:
 
 * g++ 12.x
 
+* GNU Binutils 2.x (mainly *as* and *objcopy*) for **riscv64-elf**
 
 Optional:
 
