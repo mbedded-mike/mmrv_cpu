@@ -31,6 +31,7 @@ main_ctl:
 	./obj_dir/Vmain_ctl
 
 core:
+	make -C ${TBS_PATH}/rvasm/
 	${VERILATOR} ${VERILATOR_FLAGS} ${RTL_PATH}/core.sv \
 		${RTL_PATH}/instr_decoder.sv \
 		${RTL_PATH}/register_file.v  \
