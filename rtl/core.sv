@@ -114,6 +114,6 @@ module core
     
     assign rd_in =  dctl_signals.rd_in_sel == 2'b01  ? imm : 
                     dctl_signals.rd_in_sel == 2'b10  ? alu_result :
-                                                       pc; 
+                                                       pc + 4; 
 
 endmodule;
