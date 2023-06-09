@@ -1,4 +1,4 @@
-BASE=riscv64-elf
+BASE=riscv32-elf
 AS=${BASE}-as
 OBJCOPY=${BASE}-objcopy
 AS_FLAGS=-march=rv32i -mlittle-endian
