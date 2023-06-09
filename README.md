@@ -4,6 +4,9 @@ My implementation of RV32I ISA. This is my first own CPU microarchitecture ever 
 
 The aim of this project is to create a somewhat compliant RV32I + Zicsr CPU with Machine level support only (suitable for embedded systems)
 
+
+Read more about RISC-V: [https://riscv.org/technical/specifications/](https://riscv.org/technical/specifications/)
+
 ## behavioral\_simulation
 
 Requirements:
