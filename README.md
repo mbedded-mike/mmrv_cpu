@@ -44,7 +44,7 @@ make core -j`nproc`
 
 ## milestones
 
-[ ] Multicycle CPU design
+[ ] Multicycle CPU design with every I and Zicsr instruction implemented
 
 [ ] Pipelined CPU
 
