@@ -33,7 +33,11 @@ module alu
                     LSL: result <= operand1 << operand2;
                     default: result <= 32'b0;
                 endcase
-            end
+                // synthesis translate_off
+
+                $display("ALU: %d %s %d", $signed(operand1), op_sel.name(), $signed(operand2));
+                // synthesis translate_on
+            end 
     end
 
 endmodule 

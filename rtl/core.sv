@@ -30,7 +30,7 @@ module core
                 if (dctl_signals.pc_in_sel)
                     pc <= pc + 4;
                 else
-                    pc <= alu_result;
+                    pc <= {alu_result[31:1], 1'b0};
             end
 
             if (mctl_signals.fetch_en)

@@ -34,13 +34,14 @@ module instr_decoder
 
     assign ctl_signals.regfile_we = (instr.any.opcode == LUI) ? 1 : 0;
 
-    assign rs1_idx = 5'b0;
+    assign rs1_idx = (instr.any.opcode == JALR) ? instr.itype.rs1 : 5'b0;
     assign rs2_idx = 5'b0;
 
     assign rd_idx = (
             instr.any.opcode == LUI
         ||  instr.any.opcode == AUIPC
         ||  instr.any.opcode == JAL
+        ||  instr.any.opcode == JALR
     ) ? instr.utype.rd : 5'b0; 
 
     wire signed [31:0] jimm;
@@ -53,17 +54,25 @@ module instr_decoder
     /* sign extend the immediate value */
     assign jimm[31:21] = (instr.utype.imm[19]) ? 11'h7FF : 11'b0;
 
+
+    wire signed [31:0] iimm;
+    
+    assign iimm[11:0] = instr.itype.imm;
+    /* sign extend */
+    assign iimm[31:12] = (instr.itype.imm[11]) ? 20'hFFFFF : 20'b0;
+
     assign rd_in = 
         (instr.any.opcode == LUI || instr.any.opcode == AUIPC) ? { instr.utype.imm, 12'b0 } :
-        (instr.any.opcode == JAL) ? jimm
+        (instr.any.opcode == JAL) ? jimm :
+        (instr.any.opcode == JALR) ? iimm 
         : 32'b0;    
     
     assign ctl_signals.rs1_sel = (instr.any.opcode == AUIPC || instr.any.opcode == JAL) ? 0 : 1;
-    assign ctl_signals.rs2_sel = (instr.any.opcode == AUIPC || instr.any.opcode == JAL) ? 0 : 1;
+    assign ctl_signals.rs2_sel = (instr.any.opcode == AUIPC || instr.any.opcode == JAL || instr.any.opcode == JALR) ? 0 : 1;
     assign ctl_signals.rd_in_sel  = (instr.any.opcode == AUIPC) ? 2'b10 : 
-                                    (instr.any.opcode == JAL) ? 2'b00 : 2'b01;
+                                    (instr.any.opcode == JAL || instr.any.opcode == JALR) ? 2'b00 : 2'b01;
 
     assign ctl_signals.alu_sel = (instr.any.opcode == AUIPC) ? ADD : 0;
-    assign ctl_signals.pc_in_sel = (instr.any.opcode == JAL) ? 0 : 1;
+    assign ctl_signals.pc_in_sel = (instr.any.opcode == JAL || instr.any.opcode == JALR) ? 0 : 1;
 
 endmodule

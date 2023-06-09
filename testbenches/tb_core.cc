@@ -14,7 +14,7 @@ static const char* binary_path = "testbenches/rvasm/build/testprog.bin";
 static std::unique_ptr<vluint32_t[]> load_binary(const char* path);
 
 vluint64_t sim_time = 0;
-static constexpr vluint64_t MAX_SIM_TIME = 32;
+static constexpr vluint64_t MAX_SIM_TIME = 50;
 static size_t memory_size;
 
 typedef Vcore___024unit::opcode_t opcode_t;
@@ -38,7 +38,7 @@ int main(int argc, char** argv, char** env)
     dut->clk = 1;
     dut->ce = 1;
     dut->reset = 0;
-while(sim_time < MAX_SIM_TIME) 
+    while(sim_time < MAX_SIM_TIME) 
     {
         dut->memout = phy_mem[(dut->memaddr / 4)];
 
@@ -52,7 +52,7 @@ while(sim_time < MAX_SIM_TIME)
     }
 
     dump_regs(stdout, dut);
-    dump_mem(stdout, phy_mem.get(), memory_size / 4);
+    //dump_mem(stdout, phy_mem.get(), memory_size / 4);
 
     m_trace->close();
     delete dut;
