@@ -18,12 +18,17 @@ module register_file #(
 );
 
     reg [REGISTER_WIDTH-1:0] regs[NREGS-1:0];
+    
+    /* the ISA says x0 should be hardwired to zero
+     * and any writes to it should be discarded
+     */
+    assign regs[0] = 32'b0; 
 
     always @ (posedge clk)
     begin
         if (ce)
         begin
-            if (write_en)
+            if (write_en && rd_idx != 5'b0)
             begin
                 regs[rd_idx] <= data_in;
             end
