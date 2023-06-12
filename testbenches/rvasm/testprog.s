@@ -4,7 +4,6 @@ jalr ra, t2, 4  # jump to t2 + 4 (4100 / L1) and link
 auipc t3, 0xc0c # this should never execute because of the previous jump
 
 .org 4100 
+L1:
 auipc t4, 0xc0c 
-jal ra, -4   # infinite loop
-
-.fill 64, 1, 0x00
+jal ra, L1  # infinite loop
