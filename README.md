@@ -1,9 +1,9 @@
 # mmrv\_cpu
 
-My implementation of RV32I ISA. This is my first own CPU microarchitecture ever :)
+My implementation of RV32I ISA.
 
 The aim of this project is to create a somewhat compliant RV32I + Zicsr CPU with Machine level support only (suitable for embedded systems)
-
+Right now the core is only able to execute just a few instructions and it's not turing complete yet ;]
 
 Read more about RISC-V: [https://riscv.org/technical/specifications/](https://riscv.org/technical/specifications/)
 
