@@ -45,6 +45,22 @@ If you want to just simulate the whole thing, just type:
 make core -j`nproc`
 ```
 
+## current iteration
+
+The plan is to do this project in iterations. In each iteration the IP will be rewritten/modified to a new design, for example:
+``` 
+multicycle -> pipelined -> out-of-order -> ...
+```
+
+
+Current iteration's is: **multicycle design**
+
+
+Status: **work in progress**
+
+
+Docs (**work in progress**): [wiki](https://github.com/mbedded-mike/mmrv\_cpu/wiki)
+
 ## milestones
 
 [ ] Multicycle CPU design with every I and Zicsr instruction implemented
