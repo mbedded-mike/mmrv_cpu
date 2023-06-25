@@ -53,7 +53,7 @@ multicycle -> pipelined -> out-of-order -> ...
 ```
 
 
-Current iteration's is: **multicycle design**
+Current iteration is: **multicycle design**
 
 
 Status: **work in progress**
