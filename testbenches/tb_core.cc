@@ -6,20 +6,17 @@
 #include "Vcore__Syms.h"
 #include <cstdio>
 #include <memory>
+#include "util.hh"
 
 static const char* waveform_path = "waveforms/tb_core.vcd";
 
 static const char* binary_path = "testbenches/rvasm/build/testprog.bin";
 
-static std::unique_ptr<vluint32_t[]> load_binary(const char* path);
-
 vluint64_t sim_time = 0;
-static constexpr vluint64_t MAX_SIM_TIME = 50;
+static constexpr vluint64_t MAX_SIM_TIME = 80;
 static size_t memory_size;
 
 typedef Vcore___024unit::opcode_t opcode_t;
-
-#define WORD_ALIGNED(x) ((x & 0b11U) == 0)
 
 void dump_regs(FILE* fd, Vcore* dut);
 void dump_mem(FILE* fd, vluint32_t* memptr, size_t length);
@@ -28,8 +25,10 @@ int main(int argc, char** argv, char** env)
 {
     Vcore *dut = new Vcore;
 
-    auto phy_mem = load_binary(binary_path);
-
+    auto contents = load_binary(binary_path);
+    auto phy_mem = std::move(contents.first);
+    memory_size = contents.second;
+    
     Verilated::traceEverOn(true);
     VerilatedVcdC *m_trace = new VerilatedVcdC;
     dut->trace(m_trace, 5);
@@ -40,7 +39,7 @@ int main(int argc, char** argv, char** env)
     dut->reset = 0;
     while(sim_time < MAX_SIM_TIME) 
     {
-        dut->memout = phy_mem[(dut->memaddr / 4)];
+        dut->memout = (vluint32_t)phy_mem[(dut->memaddr / 4)];
 
         dut->clk ^= 1; 
         
@@ -57,21 +56,6 @@ int main(int argc, char** argv, char** env)
     m_trace->close();
     delete dut;
     exit(EXIT_SUCCESS);
-}
-
-std::unique_ptr<vluint32_t[]> load_binary(const char* path)
-{
-    FILE* fp = fopen(path, "rb");
-    
-    fseek(fp, 0UL, SEEK_END);
-    size_t length = ftell(fp);
-    memory_size = length; 
-    rewind(fp);
-    std::unique_ptr<vluint32_t[]> contents(new vluint32_t[length]); 
-
-    fread(reinterpret_cast<void*>(contents.get()), 1UL, length, fp);
-    
-    return std::move(contents); 
 }
 
 void dump_regs(FILE* fd, Vcore* dut)
