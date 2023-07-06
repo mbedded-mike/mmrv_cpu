@@ -61,6 +61,30 @@ Status: **work in progress**
 
 Docs (**work in progress**): [wiki](https://github.com/mbedded-mike/mmrv\_cpu/wiki)
 
+
+Here are currently supported instructions (they'll be added successively as the project progresses):
+
+| supported instructions |
+| ---------------------- |
+| lui |
+| auipc |
+| jal |
+| jalr |
+| beq |
+| bne |
+| blt |
+| bge |
+
+
+### Current objectives for this iteration:
+
+[ ] implement every instruction from the RV32I
+
+[ ] improve verification methods and add better testbenches and more coverage
+
+[ ] add/create RV32I compliance tests
+
+
 ## milestones
 
 [ ] Multicycle CPU design with every I and Zicsr instruction implemented
