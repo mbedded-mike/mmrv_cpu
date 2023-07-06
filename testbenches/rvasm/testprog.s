@@ -6,4 +6,6 @@ auipc t3, 0xc0c # this should never execute because of the previous jump
 .org 4100 
 L1:
 auipc t4, 0xc0c 
+beq t1, t2, L1
+lui t1, 1
 jal ra, L1  # infinite loop

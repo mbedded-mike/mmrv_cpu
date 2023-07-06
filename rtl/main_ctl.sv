@@ -10,6 +10,7 @@ typedef struct packed
     logic gp_regfile_ce;
     logic instrdec_ce;
     logic pc_inc;
+    logic branch_taken;
 } main_ctl_signals /*verilator public */;
 
 module main_ctl 
@@ -18,6 +19,7 @@ module main_ctl
     input ce,
     input reset,
     input instr_t instr,
+    input alu_flags_t alu_flags,
     output main_ctl_signals ctl_signals
 );
     
@@ -47,6 +49,16 @@ module main_ctl
         end 
     end
 
+    logic branch_taken;
+    assign branch_taken = (instr.any.opcode == BRANCH) && ( 
+       ( (instr.btype.funct3 == BEQ) && alu_flags.zero )    ||
+       ( (instr.btype.funct3 == BNE) && !alu_flags.zero )   ||
+       ( (instr.btype.funct3 == BLT) && alu_flags.sign )    ||
+       ( (instr.btype.funct3 == BGE) && !alu_flags.sign) 
+    );
+
+    assign ctl_signals.branch_taken = branch_taken;     
+
     always @ (state, ce, instr)
     begin
         if (ce)
@@ -67,10 +79,12 @@ module main_ctl
     assign ctl_signals.instrdec_ce   = (state == DECODE) ? 1 : 0;
     assign ctl_signals.pc_inc        = (state == EXECUTE && 
                                         instr.any.opcode != JAL &&
-                                        instr.any.opcode != JALR ) ||
+                                        instr.any.opcode != JALR &&
+                                        instr.any.opcode != BRANCH ) ||
                                         (state == WRITEBACK && (
                                         instr.any.opcode == JAL || 
-                                        instr.any.opcode == JALR)
+                                        instr.any.opcode == JALR ||
+                                        instr.any.opcode == BRANCH)
                                         ) ? 1 : 0;
 
     assign ctl_signals.fetch_en      = (state == FETCH) ? 1 : 0;

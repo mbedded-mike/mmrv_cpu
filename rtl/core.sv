@@ -28,7 +28,18 @@ module core
             if (mctl_signals.pc_inc)
             begin
                 if (dctl_signals.pc_in_sel)
-                    pc <= pc + 4;
+                begin
+                    if (mctl_signals.branch_taken)
+                    begin
+                        pc <= pc + imm;
+                        $display("WTF");
+                    end
+                    else
+                    begin
+                        pc <= pc + 4;
+                        $display("PC + 4");
+                    end
+                end 
                 else
                     pc <= {alu_result[31:1], 1'b0};
             end
@@ -58,7 +69,8 @@ module core
         .ce(ce),
         .reset(reset),
         .instr(ir),
-        .ctl_signals(mctl_signals)
+        .ctl_signals(mctl_signals),
+        .alu_flags(alu_flags)
     );
     
     wire [4:0] rd_idx;
@@ -100,13 +112,16 @@ module core
     wire [31:0] alu_rhs;
     wire [31:0] alu_result;
 
+    alu_flags_t alu_flags; 
+
     alu main_alu(
         .clk(clk),
         .ce(mctl_signals.alu_ce),
         .op_sel(dctl_signals.alu_sel),
         .operand1(alu_lhs),
         .operand2(alu_rhs),
-        .result(alu_result)
+        .result(alu_result),
+        .flags(alu_flags)
     );
 
     assign alu_lhs = dctl_signals.rs1_sel ? rs1 : pc;

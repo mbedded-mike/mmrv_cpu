@@ -28,14 +28,20 @@ module instr_decoder
             begin
                 $display("JTYPE IMM, decoded: \t%d (0x%8h)", jimm, jimm);
             end
+
+            if(instr.any.opcode == BRANCH)
+            begin
+                $display("BTYPE IMM, decoded: \t%d (0x%8h)", bimm, bimm);
+            end
         end 
     end
     // synthesis translate_on 
 
     assign ctl_signals.regfile_we = (instr.any.opcode == LUI) ? 1 : 0;
 
-    assign rs1_idx = (instr.any.opcode == JALR) ? instr.itype.rs1 : 5'b0;
-    assign rs2_idx = 5'b0;
+    assign rs1_idx = (instr.any.opcode == JALR ||
+                      instr.any.opcode == BRANCH) ? instr.itype.rs1 : 5'b0;
+    assign rs2_idx = (instr.any.opcode == BRANCH) ? instr.btype.rs2 : 5'b0;
 
     assign rd_idx = (
             instr.any.opcode == LUI
@@ -61,18 +67,29 @@ module instr_decoder
     /* sign extend */
     assign iimm[31:12] = (instr.itype.imm[11]) ? 20'hFFFFF : 20'b0;
 
+    wire signed [31:0] bimm;
+
+    assign bimm[31:12] = (instr.btype.imm_pt2[6]) ? 20'hFFFFF : 20'b0;
+    assign bimm[10:5] = instr.btype.imm_pt2[5:0];
+    assign bimm[4:1] = instr.btype.imm_pt1[4:1];
+    assign bimm[0] = 0;
+    assign bimm[11] = instr.btype.imm_pt1[0];
+
+
     assign rd_in = 
         (instr.any.opcode == LUI || instr.any.opcode == AUIPC) ? { instr.utype.imm, 12'b0 } :
         (instr.any.opcode == JAL) ? jimm :
-        (instr.any.opcode == JALR) ? iimm 
-        : 32'b0;    
+        (instr.any.opcode == JALR) ? iimm : 
+        (instr.any.opcode == BRANCH) ? bimm :
+        32'b0;    
     
     assign ctl_signals.rs1_sel = (instr.any.opcode == AUIPC || instr.any.opcode == JAL) ? 0 : 1;
     assign ctl_signals.rs2_sel = (instr.any.opcode == AUIPC || instr.any.opcode == JAL || instr.any.opcode == JALR) ? 0 : 1;
     assign ctl_signals.rd_in_sel  = (instr.any.opcode == AUIPC) ? 2'b10 : 
                                     (instr.any.opcode == JAL || instr.any.opcode == JALR) ? 2'b00 : 2'b01;
 
-    assign ctl_signals.alu_sel = (instr.any.opcode == AUIPC) ? ADD : 0;
-    assign ctl_signals.pc_in_sel = (instr.any.opcode == JAL || instr.any.opcode == JALR) ? 0 : 1;
+    assign ctl_signals.alu_sel = (instr.any.opcode == AUIPC) ? ADD :
+                                 (instr.any.opcode == BRANCH ) ? SUB : 0;
+    assign ctl_signals.pc_in_sel = (instr.any.opcode == JAL || instr.any.opcode == JALR) ? 0 : 1; 
 
 endmodule

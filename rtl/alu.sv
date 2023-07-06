@@ -9,13 +9,17 @@ module alu
     input [31:0] operand1,
     input [31:0] operand2,
     
-    output reg [31:0] result
+    output reg [31:0] result,
+    output alu_flags_t flags
 );
+
+    reg overflow;
 
     always @ (posedge clk)
     begin
             if (ce)
             begin
+                overflow <= 0;
                 /*
                     Note:
                     To clarify, why the default operators are used to perform arithmetic operations:
@@ -24,8 +28,8 @@ module alu
                     might do better than implementing adders and/or shifters structurally
                 */
                 case (op_sel)
-                    ADD: result <= operand1 + operand2;
-                    SUB: result <= operand1 - operand2;
+                    ADD: {overflow, result} <= operand1 + operand2;
+                    SUB: {overflow, result} <= operand1 - operand2;
                     XOR: result <= operand1 ^ operand2;
                     OR: result <= operand1 | operand2;
                     AND: result <= operand1 & operand2;
@@ -40,4 +44,7 @@ module alu
             end 
     end
 
+    assign flags.zero = result == 32'b0;
+    assign flags.sign = result[31];
+    assign flags.overflow = overflow;
 endmodule 
